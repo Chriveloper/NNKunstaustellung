@@ -18,9 +18,10 @@ print("Wände Linien:", waendeLinien)
 
 def kunstwerkPolygon(kunstwerk):
     sichtPolygon = raumPolygon
-    kunstwerkPunkt = kunstwerk
+    schattenListe = []
     for wand in waendeLinien:
-        return null
+        schattenListe.append(schatten(kunstwerk, wand))
+    return removeShadows(sichtPolygon, schattenListe)
 
 def schatten(punkt, wand):
     line1 = LineString(punkt, wand.coords[0])
@@ -57,7 +58,7 @@ def getSlope(p1, p2):
 
 
 # removing shaddows from the polygon
-def removeShaddows(polygon_a, shaddows):
+def removeShadows(polygon_a, shaddows):
     for shadow in shaddows:
         polygon_a = polygon_a.difference(shadow)
     return polygon_a
