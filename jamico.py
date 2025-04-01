@@ -88,4 +88,4 @@ def plot_room(room, guards, lines_of_sight=True, vis_polygons=False):
 
 room = create_room(15, 15, 0.2, 12)
 guards = [Point(random.random() * 15, random.random() * 15) for i in range(4)]
-plot_room(room, guards)
+# plot_room(room, guards)
