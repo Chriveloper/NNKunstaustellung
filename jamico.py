@@ -31,7 +31,7 @@ def create_room(x_length, y_length, wall_density, art_piece_number):
 
     outer_room = Polygon([(0, 0), (x_length, 0), (x_length, y_length), (0, y_length)])
 
-    return (outer_room, walls, art_pieces)
+    return (walls, art_pieces, outer_room)
 
 # Imprecise ray casting algorithm, but probably the best approach here
 def visibility_polygon(p, walls, num_rays=1000, N=10000):
@@ -52,7 +52,7 @@ def visibility_polygon(p, walls, num_rays=1000, N=10000):
 
 
 def plot_room(room, guards, lines_of_sight=True, vis_polygons=False):
-    walls, art_pieces = room
+    walls, art_pieces, *outer_room = room
 
     # Scatterplot for art pieces
     x = [art_piece.x for art_piece in art_pieces]
@@ -90,8 +90,3 @@ def plot_room(room, guards, lines_of_sight=True, vis_polygons=False):
             x, y = vis_poly.exterior.xy
             plt.fill(x, y, color=colors[art_piece], alpha=0.1)
     plt.show()
-
-
-room = create_room(15, 15, 0.2, 12)
-guards = [Point(random.random() * 15, random.random() * 15) for i in range(4)]
-plot_room(room, guards)
