@@ -25,13 +25,23 @@ def kunstwerkPolygon(kunstwerk):
 def schatten(punkt, wand):
     line1 = LineString(punkt, wand.coords[0])
     line2 = LineString(punkt, wand.coords[1])
+    extendedPoint1 = wand.coords[0] + getScaledVector(line1)
+    extendedPoint2 = wand.coords[1] + getScaledVector(line2)
+    return Polygon([wand.coords[0], wand.coords[1], extendedPoint1, extendedPoint2])
 
 
 def getScaledVector(line):
+    minLength = raumPolygon.length
     startPoint = line.coords[0]
     endPoint = line.coords[1]
-    vector = (endPoint[0] - startPoint[0], endPoint[0] - startPoint[1])
-
+    vector = (endPoint[0] - startPoint[0], endPoint[1] - startPoint[1])
+    vectorLength = np.sqrt(vector[0]**2 + vector[1]**2)
+    if vectorLength < minLength:
+        scaleFactor = minLength / vectorLength
+        scaledVector = (vector[0] * scaleFactor, vector[1] * scaleFactor)
+        return scaledVector
+    return vector
+    
 
 guards = [Point(random.random() * 15, random.random() * 15) for i in range(4)]
 plot_room(room, guards)
