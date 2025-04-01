@@ -33,9 +33,26 @@ guards = [Point(random.random() * 15, random.random() * 15) for i in range(4)]
 plot_room(room, guards)
 
 
+
+
+
+
+
+
 def getSlope(p1, p2):
     x1, y1 = p1
     x2, y2 = p2
     if x1 == x2:
         raise ValueError("Slope is undefined for vertical lines.")
     return (y2 - y1) / (x2 - x1)
+
+
+
+# funktion die shaddows aus dem polygon entfernt und das polygon zurückgibt  
+def removeShaddows(polygon_a, shaddows):
+    for shadow in shaddows:
+        polygon_a = polygon_a.difference(shadow)
+    return polygon_a
+
+
+        
