@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from shapely import Point, LineString, Polygon
 
+
+
 def create_room(x_length, y_length, wall_density, art_piece_number):
     # add art pieces in random locations
     art_pieces = [Point(random.random() * x_length, random.random() * y_length) for i in range(art_piece_number)]
@@ -27,6 +29,13 @@ def create_room(x_length, y_length, wall_density, art_piece_number):
     walls.append(LineString([(x_length, 0), (x_length, y_length)]))
     walls.append(LineString([(0, y_length), (x_length, y_length)]))
 
+    # print all walls in console and total number of walls
+    
+    for wall in walls:
+        print(wall)
+    
+    print("Total number of walls: ", len(walls))
+    
     return (walls, art_pieces)
 
 # Imprecise ray casting algorithm, but probably the best approach here
@@ -44,6 +53,8 @@ def visibility_polygon(p, walls, num_rays=1000, N=10000):
         if first_intersections[angles[i]][1] != first_intersections[angles[i - 1]][1] or first_intersections[angles[i]][1] != first_intersections[angles[(i + 1)%num_rays]][1]:
             polygon_vertices.append(first_intersections[angles[i]][0])
     return Polygon(polygon_vertices)
+
+
 
 def plot_room(room, guards, lines_of_sight=True, vis_polygons=False):
     walls, art_pieces = room
