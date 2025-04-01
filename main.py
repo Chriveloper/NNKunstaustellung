@@ -56,17 +56,64 @@ def removeShaddows(polygon_a, shaddows):
 
 arrKunstwerke = ["a", "b", "c", "d", "e", "f", "g", "h"]
 # create an array with random polygons for each kunstwerk inside a 30x30 room nammed arrView
-arrView = []
+arrViews = []
 for i in range(len(arrKunstwerke)):
-    arrView.append(Polygon([Point(random.random() * 15, random.random() * 15) for j in range(4)]))
+    arrViews.append(Polygon([Point(random.random() * 15, random.random() * 15) for j in range(4)]))
 
 
-def createDict(arrKunstwerke, arrView):
-    # create a dict with the keys as boolean value array of intersection from a kunstwerk and the values as the intersection of the polygons from the kunstwerk view
-    dictKunstwerke = {}
-    for i in range(len(arrKunstwerke)):
-        dictKunstwerke[arrKunstwerke[i]] = arrView[i]
-    return dictKunstwerke
+# def createDict(artworks, artworkViewAreas):
+#     dictKunstwerke = {}
+#     keys = [[]]
+#     values = []
     
+#     i = 0
+#     for a in artworkViewAreas:
+#         locKey = []
+#         locValue
+#         locKey[i] = true
+#         j = 0 
+#         for b in artworkViewAreas:
+#             if a==b:
+#                 continue
+#             else:
+#                     locKey[a.intersects(b)] 
+#             j += 1
+#         i += 1
+#         keys.append(locKey)
 
-        
+
+def createDict(Areas):
+    result_dict = {}
+
+    num_polygons = len(Areas)
+
+    # Iterate through all possible intersection combinations
+    for i in range(1, 2**num_polygons):  # Avoid empty set (i=0)
+        intersection = None
+        locKey = [False] * num_polygons  # Initialize key with all False
+
+        for j in range(num_polygons):
+            if i & (1 << j):  # Check if polygon j is in this combination
+                if intersection is None:
+                    intersection = Areas[j]  # Start with first selected polygon
+                else:
+                    intersection = intersection.intersection(Areas[j])  # Intersect with next
+                
+                locKey[j] = True  # Mark polygon as included
+
+        # Store the intersection polygon only if it's valid (not empty)
+        if intersection and not intersection.is_empty:
+            result_dict[tuple(locKey)] = intersection
+
+    return result_dict
+
+# Example polygons
+polygon1 = Polygon([(0, 0), (4, 0), (4, 4), (0, 4)])  # Square
+polygon2 = Polygon([(2, 2), (6, 2), (6, 6), (2, 6)])  # Overlaps with polygon1
+polygon3 = Polygon([(5, 5), (7, 5), (7, 7), (5, 7)])  # Overlaps with polygon2
+
+Areas = [polygon1, polygon2, polygon3]
+
+
+
+print(createDict(arrViews))
