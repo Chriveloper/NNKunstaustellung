@@ -29,14 +29,9 @@ def create_room(x_length, y_length, wall_density, art_piece_number):
     walls.append(LineString([(x_length, 0), (x_length, y_length)]))
     walls.append(LineString([(0, y_length), (x_length, y_length)]))
 
-    # print all walls in console and total number of walls
-    
-    for wall in walls:
-        print(wall)
-    
-    print("Total number of walls: ", len(walls))
-    
-    return (walls, art_pieces)
+    outer_room = Polygon([(0, 0), (x_length, 0), (x_length, y_length), (0, y_length)])
+
+    return (outer_room, walls, art_pieces)
 
 # Imprecise ray casting algorithm, but probably the best approach here
 def visibility_polygon(p, walls, num_rays=1000, N=10000):
