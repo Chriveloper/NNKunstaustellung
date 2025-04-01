@@ -53,3 +53,30 @@ def getSlope(p1, p2):
     if x1 == x2:
         raise ValueError("Slope is undefined for vertical lines.")
     return (y2 - y1) / (x2 - x1)
+
+
+
+# removing shaddows from the polygon
+def removeShaddows(polygon_a, shaddows):
+    for shadow in shaddows:
+        polygon_a = polygon_a.difference(shadow)
+    return polygon_a
+
+
+
+arrKunstwerke = ["a", "b", "c", "d", "e", "f", "g", "h"]
+# create an array with random polygons for each kunstwerk inside a 30x30 room nammed arrView
+arrView = []
+for i in range(len(arrKunstwerke)):
+    arrView.append(Polygon([Point(random.random() * 15, random.random() * 15) for j in range(4)]))
+
+
+def createDict(arrKunstwerke, arrView):
+    # create a dict with the keys as boolean value array of intersection from a kunstwerk and the values as the intersection of the polygons from the kunstwerk view
+    dictKunstwerke = {}
+    for i in range(len(arrKunstwerke)):
+        dictKunstwerke[arrKunstwerke[i]] = arrView[i]
+    return dictKunstwerke
+    
+
+        
