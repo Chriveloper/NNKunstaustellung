@@ -1,5 +1,5 @@
 
-from jamico import guards, plot_room, create_room
+from jamico import plot_room, create_room
 from shapely import Point, LineString, Polygon
 import random
 import matplotlib.pyplot as plt
@@ -11,15 +11,15 @@ raumPolygon = room[2]
 kunstwerkPunkte = room[1]
 waendeLinien = room[0]
 
-print("Kunstausstellung:", kunstausstellung)
-print("Kunstwerke:", kunstwerke)
+# print("Kunstausstellung:", kunstausstellung)
+# print("Kunstwerke:", kunstwerke)
 # print("Wände:", waende)
 
 
 def kunstwerkPolygon(kunstwerk):
     sichtPolygon = raumPolygon
     kunstwerkPunkt = kunstwerk
-    for wand in waendeLinien:
+    #for wand in waendeLinien:
 
 def schatten(punkt, wand):
     linie1 = LineString([punkt, wand.coords[0]])
@@ -31,14 +31,11 @@ plot_room(room, guards)
 
 plot_room(room, guards)
 
-print(guards)
-print(room[0])
-print(room[1])
 
 walls = room[0]
 art_pieces = room[1] 
 
-
+print(walls[0])
 
 def getVis(art_piece, wall):
     i = 0
