@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from shapely import Point, LineString, Polygon
 
+
+
 def create_room(x_length, y_length, wall_density, art_piece_number):
     # add art pieces in random locations
     art_pieces = [Point(random.random() * x_length, random.random() * y_length) for i in range(art_piece_number)]
@@ -27,7 +29,9 @@ def create_room(x_length, y_length, wall_density, art_piece_number):
     walls.append(LineString([(x_length, 0), (x_length, y_length)]))
     walls.append(LineString([(0, y_length), (x_length, y_length)]))
 
-    return (walls, art_pieces)
+    outer_room = Polygon([(0, 0), (x_length, 0), (x_length, y_length), (0, y_length)])
+
+    return (walls, art_pieces, outer_room)
 
 # Imprecise ray casting algorithm, but probably the best approach here
 def visibility_polygon(p, walls, num_rays=1000, N=10000):
@@ -45,8 +49,10 @@ def visibility_polygon(p, walls, num_rays=1000, N=10000):
             polygon_vertices.append(first_intersections[angles[i]][0])
     return Polygon(polygon_vertices)
 
+
+
 def plot_room(room, guards, lines_of_sight=True, vis_polygons=False):
-    walls, art_pieces = room
+    walls, art_pieces, *outer_room = room
 
     # Scatterplot for art pieces
     x = [art_piece.x for art_piece in art_pieces]
@@ -84,8 +90,3 @@ def plot_room(room, guards, lines_of_sight=True, vis_polygons=False):
             x, y = vis_poly.exterior.xy
             plt.fill(x, y, color=colors[art_piece], alpha=0.1)
     plt.show()
-
-
-room = create_room(15, 15, 0.2, 12)
-guards = [Point(random.random() * 15, random.random() * 15) for i in range(4)]
-# plot_room(room, guards)
