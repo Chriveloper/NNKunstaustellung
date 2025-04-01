@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from shapely import Point, LineString, Polygon
 from jamico import create_room, plot_room
+
+
 room = create_room(30, 30, 0.2, 15)
 
 raumPolygon = room[2]
@@ -22,11 +24,20 @@ def kunstwerkPolygon(kunstwerk):
 def schatten(punkt, wand):
 
 
-def get_intersection(startPoint, endPoint, polygon, extensionStep=10, maxIterations=100):
+def get_intersection(startPoint, endPoint, polygon):
     line = LineString([startPoint, endPoint])
-    vector
-
-
+    # get vector of the line
+    vector = (endPoint[0] - startPoint[0], endPoint[0] - startPoint[0])
+    ray = line
+    # keep extending the ray end until it hits the polygon
+    while True:
+        extendedRay = LineString([ray.coords[0], (ray.coords[1][0] + vector[0], ray.coords[1][1] + vector[1])])
+        intersection = extendedRay.intersection(polygon)
+        if intersection.is_empty:
+            ray = extendedRay
+        else:
+            # return the intersection a bit further from the intersection added vector
+            return Point(intersection.coords[0][0] + vector[0], intersection.coords[0][1] + vector[1])
 
 
 guards = [Point(random.random() * 15, random.random() * 15) for i in range(4)]
