@@ -108,14 +108,6 @@ plt.grid(True)
 plt.show()
 
 
-
-arrKunstwerke = ["a", "b", "c", "d", "e", "f", "g", "h"]
-# create an array with random polygons for each kunstwerk inside a 30x30 room nammed arrView
-arrViews = []
-for i in range(len(arrKunstwerke)):
-    arrViews.append(Polygon([Point(random.random() * 15, random.random() * 15) for j in range(4)]))
-
-
 # def createDict(artworks, artworkViewAreas):
 #     dictKunstwerke = {}
 #     keys = [[]]
@@ -126,12 +118,15 @@ for i in range(len(arrKunstwerke)):
 #         locKey = []
 #         locValue
 #         locKey[i] = true
+#         locValue = a
 #         j = 0 
 #         for b in artworkViewAreas:
 #             if a==b:
 #                 continue
 #             else:
-#                     locKey[a.intersects(b)] 
+#                     if locValue.intersects(b):
+#                       locKey[j] = true
+#                       locValue = a.intersection(b)
 #             j += 1
 #         i += 1
 #         keys.append(locKey)
@@ -166,9 +161,17 @@ def createDict(Areas):
 polygon1 = Polygon([(0, 0), (4, 0), (4, 4), (0, 4)])  # Square
 polygon2 = Polygon([(2, 2), (6, 2), (6, 6), (2, 6)])  # Overlaps with polygon1
 polygon3 = Polygon([(5, 5), (7, 5), (7, 7), (5, 7)])  # Overlaps with polygon2
+# create another list of example polygons
+polygon4 = Polygon([(8, 8), (10, 8), (10, 10), (8, 10)])  # No overlap
+# five more
+polygon5 = Polygon([(12, 12), (14, 12), (14, 14), (12, 14)])  # No overlap
+polygon6 = Polygon([(15, 15), (17, 15), (17, 17), (15, 17)])  # No overlap
+# more
+polygon7 = Polygon([(18, 18), (20, 18), (20, 20), (18, 20)])  # No overlap
+polygon8 = Polygon([(22, 22), (24, 22), (24, 24), (22, 24)])  # No overlap
 
-Areas = [polygon1, polygon2, polygon3]
+Areas = [polygon1, polygon2, polygon3, polygon4, polygon5, polygon6, polygon7, polygon8]
 
 
 
-print(createDict(arrViews))
+print(createDict(Areas))
