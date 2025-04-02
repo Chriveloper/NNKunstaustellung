@@ -4,7 +4,13 @@ import numpy as np
 from shapely.geometry import Point, LineString, Polygon
 
 def create_poly_room(user_polygon, wall_density, art_piece_number):
-
+    """
+    Generate a room from a user-supplied polygon.
+    - Create art pieces randomly placed inside the polygon.
+    - Store the polygon's boundary edges as walls.
+    - Optionally generate additional internal walls by sampling a fixed-length segment
+      that lies entirely within the polygon and does not cross any existing wall.
+    """
     # Create art pieces inside the user_polygon.
     minx, miny, maxx, maxy = user_polygon.bounds
     art_pieces = []
@@ -14,9 +20,47 @@ def create_poly_room(user_polygon, wall_density, art_piece_number):
             art_pieces.append(p)
     
     walls = []
+    # Store the boundary edges of the polygon as walls
+    exterior_coords = list(user_polygon.exterior.coords)
+    for i in range(len(exterior_coords) - 1):
+        wall = LineString([exterior_coords[i], exterior_coords[i + 1]])
+        walls.append(wall)
+    
+    # Generate additional internal walls.
     max_attempts = int(wall_density * 200)
     attempts = 0
 
+    # Define a fixed wall length (e.g., 10% of the bounding box diagonal)
+    diag = np.sqrt((maxx - minx) ** 2 + (maxy - miny) ** 2)
+    wall_length = diag * 0.1
+
+    while attempts < max_attempts:
+        # Pick a random starting point strictly inside the polygon.
+        pt1 = None
+        while pt1 is None:
+            candidate = Point(random.uniform(minx, maxx), random.uniform(miny, maxy))
+            if user_polygon.contains(candidate):
+                pt1 = candidate
+        # Choose a random angle.
+        angle = random.uniform(0, 2 * np.pi)
+        pt2 = Point(pt1.x + wall_length * np.cos(angle), pt1.y + wall_length * np.sin(angle))
+        candidate_wall = LineString([pt1, pt2])
+        
+        # Accept candidate only if the entire segment lies within the polygon.
+        if not user_polygon.contains(candidate_wall):
+            attempts += 1
+            continue
+        
+        # Ensure candidate wall does not properly cross any existing wall.
+        valid = True
+        for wall in walls:
+            if candidate_wall.crosses(wall):
+                valid = False
+                break
+        
+        if valid:
+            walls.append(candidate_wall)
+        attempts += 1
 
     return (walls, art_pieces, user_polygon)
 
