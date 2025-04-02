@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from shapely import Point, LineString, Polygon
 
+def create_poly_room(wall_density, art_piece_number):
 
+    return null
 
 def create_room(x_length, y_length, wall_density, art_piece_number):
     # add art pieces in random locations

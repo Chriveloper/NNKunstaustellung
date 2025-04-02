@@ -1,20 +1,15 @@
 import random
 import matplotlib.pyplot as plt
-import numpy as np
 import matplotlib.colors as mcolors
-from shapely.geometry import Point, LineString, Polygon, MultiPolygon
+from shapely.geometry import Point, Polygon, MultiPolygon
 from shapely.validation import explain_validity
-from jamico import create_room  # Assuming `create_room` is defined in `jamico`
+from jamico import create_room
 from schatten import schatten
 from dictionary import createDict  
 
 # Create the room and extract its components
 room = create_room(20, 20, 0.2, 5)
 raumPolygon, kunstwerkPunkte, waendeLinien = room[2], room[1], room[0]
-
-# print("Raum Polygon:", raumPolygon)
-# print("Kunstwerk Punkte:", kunstwerkPunkte)
-# print("Wände Linien:", waendeLinien)
 
 # Function to calculate the visibility polygon for a given art piece
 def kunstwerkPolygon(kunstwerk, raumPolygon, waendeLinien):
@@ -84,5 +79,4 @@ plt.show()
 
 
 dict_poly = createDict(visibility_polygons)
-print("Visibilityoplygons:",visibility_polygons)
-print("Dictionary of visibility polygons:", dict_poly.keys())
+print("keys of dictionary:", dict_poly.keys())
