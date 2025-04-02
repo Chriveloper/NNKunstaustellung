@@ -5,7 +5,9 @@ from shapely.geometry import Point, Polygon, MultiPolygon
 from shapely.validation import explain_validity
 from jamico import create_room
 from schatten import schatten
-from dictionary import createDict  
+from dictionary import createDict
+from scipo import getCombination
+from guard import setGuard
 
 # Create the room and extract its components
 room = create_room(20, 20, 0.2, 5)
@@ -34,10 +36,12 @@ def removeShadows(polygon_a, shadows):
     return polygon_a
 
 # Generate random guards and art piece visibility polygons
-guards = [Point(random.random() * 15, random.random() * 15) for _ in range(4)]
+
 visibility_polygons = [
     kunstwerkPolygon(kunstwerk, raumPolygon, waendeLinien) for kunstwerk in kunstwerkPunkte
 ]
+
+
 
 # Generate a list of unique colors for the polygons
 colors = list(mcolors.TABLEAU_COLORS.values())
@@ -68,15 +72,25 @@ for wall in waendeLinien:
 x, y = raumPolygon.exterior.xy
 plt.plot(x, y, color='blue', linewidth=1)
 
-# Plot the guards
-for guard in guards:
+
+
+dict_poly = createDict(visibility_polygons)
+guardPolys = getCombination(list(dict_poly.keys()))
+
+# plot the guards
+for guardPoly in guardPolys:
+    guard = setGuard(dict_poly[list(dict_poly.keys())[guardPoly]])
     plt.plot(guard.x, guard.y, 'ko')  # Black for guards
+
+
+
+
+
+
+
+
 
 # Set plot properties and display
 plt.gca().set_aspect('equal', adjustable='box')
 plt.grid(True)
 plt.show()
-
-
-dict_poly = createDict(visibility_polygons)
-print("keys of dictionary:", dict_poly.keys())

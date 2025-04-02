@@ -6,6 +6,7 @@ from shapely.geometry import Point, Polygon, MultiPolygon, MultiPoint
 def setGuard(poly):
     if isinstance(poly, MultiPolygon):
         poly = getMaxPoly(poly)
+
     all_points = generate_random_points(poly, num_points=10000)
 
     # Find the point with the maximum distance to all walls
@@ -13,8 +14,7 @@ def setGuard(poly):
 
     print(max_distance_point)  # This point will have the maximum distance to the polygon's walls
     
-    # Plot the polygon and the point
-    plot_polygon_and_point(poly, max_distance_point)
+    
 
     return max_distance_point
 
