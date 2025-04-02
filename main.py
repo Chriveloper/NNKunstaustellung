@@ -85,4 +85,4 @@ plt.show()
 
 dict_poly = createDict(visibility_polygons)
 print("Visibilityoplygons:",visibility_polygons)
-print("Dictionary of visibility polygons:", dict_poly)
+print("Dictionary of visibility polygons:", dict_poly.keys())
