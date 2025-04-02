@@ -1,36 +1,28 @@
 from pyscipopt import Model
+import numpy as np
 
-
-def getCombination(guardAreas):
-    # Number of art pieces (assumed from boolean lists)
-    print(guardAreas)
-    num_art_pieces = len(guardAreas[0])  # Assume each row corresponds to a guard
+def find_best_combination(arrays):
+    num_arrays = len(arrays)
+    num_indices = len(arrays[0])
     
-    # Create the optimization model
-    model = Model("Guard Optimization")
+    # SCIP Modell erstellen
+    model = Model("Set Covering")
     
-    # Create guard decision variables (1 if a guard is used, 0 otherwise)
-    guards = {guard: model.addVar(f"guard_{guard}", vtype="B") for guard in range(len(guardAreas))}
+    # Binäre Variablen für jedes Unterarray
+    x = {}
+    for i in range(num_arrays):
+        x[i] = model.addVar(vtype="B", name=f"x_{i}")
     
-    # Apply constraints: ensure each art piece is covered by at least one active guard
-    for art_idx in range(num_art_pieces):
-        model.addCons(
-            sum(guards[guard] for guard in range(len(guardAreas)) if guardAreas[guard][art_idx]) >= 1
-        )
+    # Jede Spalte (Index) muss mindestens einmal abgedeckt werden
+    for j in range(num_indices):
+        model.addCons(sum(x[i] for i in range(num_arrays) if arrays[i][j]) >= 1)
     
-    # Objective function: Minimize the total number of guards used
-    model.setObjective(sum(guards.values()), "minimize")
+    # Zielfunktion: Minimierung der Anzahl der gewählten Unterarrays
+    model.setObjective(sum(x[i] for i in range(num_arrays)), "minimize")
     
-    # Solve the model
+    # Problem lösen
     model.optimize()
-
-    # Output results
-    if model.getStatus() == "optimal":
-        active_guards = []
-        for guard, var in guards.items():
-            if model.getVal(var) > 0.5:  # Check if the guard is active (1)
-                active_guards.append(guard)
-        return active_guards
-    else:
-        return "No optimal solution found"
-
+    
+    # Ergebnisse auslesen
+    selected_indices = [i for i in range(num_arrays) if model.getVal(x[i]) > 0.5]
+    return selected_indices

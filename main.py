@@ -6,7 +6,7 @@ from shapely.validation import explain_validity
 from jamico import create_poly_room  # use poly room version
 from schatten import schatten
 from dictionary import createDict
-from scipo import getCombination
+from scipo import find_best_combination
 from guard import setGuard
 from interface import get_polygon
 
@@ -80,7 +80,7 @@ plt.plot(x, y, color='blue', linewidth=1)
 
 
 dict_poly = createDict(visibility_polygons)
-guardPolys = getCombination(list(dict_poly.keys()))
+guardPolys = find_best_combination(list(dict_poly.keys()))
 
 # plot the guards
 for guardPoly in guardPolys:
