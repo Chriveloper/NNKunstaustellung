@@ -1,11 +1,24 @@
 import random
 import matplotlib.pyplot as plt
 import numpy as np
-from shapely import Point, LineString, Polygon
+from shapely.geometry import Point, LineString, Polygon
 
-def create_poly_room(wall_density, art_piece_number):
+def create_poly_room(user_polygon, wall_density, art_piece_number):
 
-    return null
+    # Create art pieces inside the user_polygon.
+    minx, miny, maxx, maxy = user_polygon.bounds
+    art_pieces = []
+    while len(art_pieces) < art_piece_number:
+        p = Point(random.uniform(minx, maxx), random.uniform(miny, maxy))
+        if user_polygon.contains(p):
+            art_pieces.append(p)
+    
+    walls = []
+    max_attempts = int(wall_density * 200)
+    attempts = 0
+
+
+    return (walls, art_pieces, user_polygon)
 
 def create_room(x_length, y_length, wall_density, art_piece_number):
     # add art pieces in random locations
@@ -35,60 +48,59 @@ def create_room(x_length, y_length, wall_density, art_piece_number):
 
     return (walls, art_pieces, outer_room)
 
-# Imprecise ray casting algorithm, but probably the best approach here
-def visibility_polygon(p, walls, num_rays=1000, N=10000):
-    first_intersections = dict()
-    angles = np.linspace(0, 2*np.pi, num_rays)
-    for angle in angles:
-        q = Point(p.x + np.cos(angle) * N, p.y + np.sin(angle) * N)
-        ray = LineString([p, q])
-        all_intersections = {ray.intersection(wall): wall for wall in walls if ray.intersects(wall)}
-        closest_intersection = min(all_intersections.keys(), key=lambda r: p.distance(r))
-        first_intersections[angle] = (closest_intersection, all_intersections[closest_intersection])
-    polygon_vertices = []
-    for i in range(num_rays):
-        if first_intersections[angles[i]][1] != first_intersections[angles[i - 1]][1] or first_intersections[angles[i]][1] != first_intersections[angles[(i + 1)%num_rays]][1]:
-            polygon_vertices.append(first_intersections[angles[i]][0])
-    return Polygon(polygon_vertices)
+# # Imprecise ray casting algorithm, but probably the best approach here
+# def visibility_polygon(p, walls, num_rays=1000, N=10000):
+#     first_intersections = dict()
+#     angles = np.linspace(0, 2*np.pi, num_rays)
+#     for angle in angles:
+#         q = Point(p.x + np.cos(angle) * N, p.y + np.sin(angle) * N)
+#         ray = LineString([p, q])
+#         all_intersections = {ray.intersection(wall): wall for wall in walls if ray.intersects(wall)}
+#         closest_intersection = min(all_intersections.keys(), key=lambda r: p.distance(r))
+#         first_intersections[angle] = (closest_intersection, all_intersections[closest_intersection])
+#     polygon_vertices = []
+#     for i in range(num_rays):
+#         if first_intersections[angles[i]][1] != first_intersections[angles[i - 1]][1] or \
+#            first_intersections[angles[i]][1] != first_intersections[angles[(i + 1) % num_rays]][1]:
+#             polygon_vertices.append(first_intersections[angles[i]][0])
+#     return Polygon(polygon_vertices)
 
+# def plot_room(room, guards, lines_of_sight=True, vis_polygons=False):
+#     walls, art_pieces, *outer_room = room
 
+#     # Scatterplot for art pieces
+#     x = [art_piece.x for art_piece in art_pieces]
+#     y = [art_piece.y for art_piece in art_pieces]
+#     plt.scatter(x, y, color="blue")
 
-def plot_room(room, guards, lines_of_sight=True, vis_polygons=False):
-    walls, art_pieces, *outer_room = room
+#     # Scatterplot for guards
+#     x = [guard.x for guard in guards]
+#     y = [guard.y for guard in guards]
+#     plt.scatter(x, y, color="red")
 
-    # Scatterplot for art pieces
-    x = [art_piece.x for art_piece in art_pieces]
-    y = [art_piece.y for art_piece in art_pieces]
-    plt.scatter(x, y, color="blue")
+#     # Draw walls
+#     for wall in walls:
+#         x, y = wall.xy
+#         plt.plot(x, y, color='black')
+#     plt.xticks([])
+#     plt.yticks([])
+#     plt.xlabel('')
+#     plt.ylabel('')
 
-    #Scatterplot for guards
-    x = [guard.x for guard in guards]
-    y = [guard.y for guard in guards]
-    plt.scatter(x, y, color="red")
-
-    #Line plots for walls
-    for wall in walls:
-        x, y = wall.xy
-        plt.plot(x, y, color='black')
-    plt.xticks([])
-    plt.yticks([])
-    plt.xlabel('')
-    plt.ylabel('')
-
-    #Line plot for lines of sight
-    if lines_of_sight:
-        for guard in guards:
-            for art_piece in art_pieces:
-                line = LineString([guard, art_piece])
-                if not any(line.intersects(wall) for wall in walls):
-                    x, y = line.xy
-                    plt.plot(x, y, color='red', alpha=0.3)
+#     # Optionally draw lines of sight from guards to art pieces
+#     if lines_of_sight:
+#         for guard in guards:
+#             for art_piece in art_pieces:
+#                 line = LineString([guard, art_piece])
+#                 if not any(line.intersects(wall) for wall in walls):
+#                     x, y = line.xy
+#                     plt.plot(x, y, color='red', alpha=0.3)
     
-    # Fill visibility polygons
-    if vis_polygons:
-        colors = {art_pieces[i]: plt.get_cmap('rainbow', len(art_pieces))(i) for i in range(len(art_pieces))}
-        for art_piece in art_pieces:
-            vis_poly = visibility_polygon(art_piece, walls)
-            x, y = vis_poly.exterior.xy
-            plt.fill(x, y, color=colors[art_piece], alpha=0.1)
-    plt.show()
+#     # Optionally fill the visibility polygons using a rainbow colormap
+#     if vis_polygons:
+#         colors = {art_pieces[i]: plt.get_cmap('rainbow', len(art_pieces))(i) for i in range(len(art_pieces))}
+#         for art_piece in art_pieces:
+#             vis_poly = visibility_polygon(art_piece, walls)
+#             x, y = vis_poly.exterior.xy
+#             plt.fill(x, y, color=colors[art_piece], alpha=0.1)
+#     plt.show()
