@@ -1,27 +1,25 @@
-from shapely.geometry import Polygon
-
+from shapely.geometry import Polygon, MultiPolygon
 
 def createDict(areas):
     dictAreas = {}
     num_polygons = len(areas)
 
-    # check every combination of polygons possible
-    for i in range(1, 2**num_polygons):  
-        locValue = None
-        locKey = [False] * num_polygons  # array locKey by default with False
+    # Gehe durch alle möglichen Kombinationen von Polygonen
+    for i in range(1, 2**num_polygons):  # i=0 (leere Menge) wird übersprungen
+        intersection = None
+        locKey = [False] * num_polygons  # Standardmäßig sind alle False
 
         for j in range(num_polygons):
-            if i & (1 << j): # Check if the j-th polygon is in the combination
-                if locValue is None:
-                    locValue = areas[j]  # start with the first polygon
+            if i & (1 << j):  # Prüfe, ob das j-te Polygon in der Kombination enthalten ist
+                if intersection is None:
+                    intersection = areas[j]  # Starte mit dem ersten Polygon in der Kombination
                 else:
-                    locValue = locValue.intersection(areas[j])  # get the intersection of the polygons
+                    intersection = intersection.intersection(areas[j])  # Schnittmenge berechnen
 
-                locKey[j] = True  # areas[j] is in the combination
+                locKey[j] = True  # Markiere dieses Polygon als Teil der Schnittmenge
 
-        # only save the intersection if it is existing & not empty
-        if isinstance(poly, MultiPolygon) or isinstance(poly, Polygon): # only save if it is a polygon or multipolygon
-            if locValue and not locValue.is_empty:
-                dictAreas[tuple(locKey)] = locValue # saves the intersection of the polygons with the key as a tuple of booleans
+        # Speichere das Ergebnis nur, wenn die Schnittmenge existiert und nicht leer ist
+        if intersection and not intersection.is_empty and isinstance(intersection, (Polygon, MultiPolygon)):
+            dictAreas[tuple(locKey)] = intersection
 
     return dictAreas
