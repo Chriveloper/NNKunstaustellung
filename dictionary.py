@@ -20,7 +20,8 @@ def createDict(areas):
                 locKey[j] = True  # areas[j] is in the combination
 
         # only save the intersection if it is existing & not empty
-        if locValue and not locValue.is_empty:
-            dictAreas[tuple(locKey)] = locValue # saves the intersection of the polygons with the key as a tuple of booleans
+        if isinstance(poly, MultiPolygon) or isinstance(poly, Polygon): # only save if it is a polygon or multipolygon
+            if locValue and not locValue.is_empty:
+                dictAreas[tuple(locKey)] = locValue # saves the intersection of the polygons with the key as a tuple of booleans
 
     return dictAreas

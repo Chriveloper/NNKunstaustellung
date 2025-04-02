@@ -6,6 +6,7 @@ from shapely.geometry import Point, LineString, Polygon, MultiPolygon
 from shapely.validation import explain_validity
 from jamico import create_room  # Assuming `create_room` is defined in `jamico`
 from schatten import schatten
+from dictionary import createDict  
 
 # Create the room and extract its components
 room = create_room(20, 20, 0.2, 5)
@@ -80,3 +81,8 @@ for guard in guards:
 plt.gca().set_aspect('equal', adjustable='box')
 plt.grid(True)
 plt.show()
+
+
+dict_poly = createDict(visibility_polygons)
+
+print("Dictionary of visibility polygons:", dict_poly)
