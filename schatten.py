@@ -1,5 +1,7 @@
 import numpy as np
 from shapely.geometry import Point, LineString, Polygon, MultiPolygon
+from shapely.validation import explain_validity
+
 # Function to calculate the shadow polygon for a given point and wall
 def schatten(punkt, wand):
     line1 = LineString([punkt, wand.coords[0]])

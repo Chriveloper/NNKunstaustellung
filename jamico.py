@@ -22,8 +22,8 @@ def create_poly_room(user_polygon, wall_density, art_piece_number):
     walls = []
     # Store the boundary edges of the polygon as walls
     exterior_coords = list(user_polygon.exterior.coords)
-    for i in range(len(exterior_coords) - 1):
-        wall = LineString([exterior_coords[i], exterior_coords[i + 1]])
+    for i in range(len(exterior_coords)):
+        wall = LineString([exterior_coords[i], exterior_coords[(i + 1)%len(exterior_coords)]])
         walls.append(wall)
     
     # Generate additional internal walls.
