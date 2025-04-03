@@ -9,13 +9,12 @@ def setGuard(poly):
 
     all_points = generate_random_points(poly, num_points=10000)
     print(f"Generated {len(all_points.geoms)} valid points inside the polygon.")
-    print(f"Polygon area: {poly.area}, bounds: {poly.bounds}")
 
-
+    
     # Find the point with the maximum distance to all walls
     max_distance_point = max(all_points.geoms, key=lambda p: analyze_by_max_distance_to_walls(p, poly))
 
-    print(max_distance_point)  # This point will have the maximum distance to the polygon's walls
+    print("der punkt: ",max_distance_point)  # This point will have the maximum distance to the polygon's walls
     
     
 

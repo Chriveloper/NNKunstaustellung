@@ -82,6 +82,8 @@ plt.plot(x, y, color='blue', linewidth=1)
 dict_poly = createDict(visibility_polygons)
 guardPolys = find_best_combination(list(dict_poly.keys()))
 
+print("guard poly: ", guardPolys)
+
 # plot the guards
 for guardPoly in guardPolys:
     guard = setGuard(dict_poly[list(dict_poly.keys())[guardPoly]])

@@ -3,6 +3,7 @@ import numpy as np
 
 def find_best_combination(arrays):
     num_arrays = len(arrays)
+    print(f"Anzahl Arr: {num_arrays}")
     num_indices = len(arrays[0])
     
     # SCIP Modell erstellen
