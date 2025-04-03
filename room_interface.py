@@ -250,7 +250,8 @@ def main():
         y_length = prompt_int("Raum-Höhe (y_length)", 15)
         # wall_density = prompt_float("Wanddichte (0.0 - 1.0)", 0.2)
         art_piece_number = prompt_int("Anzahl Kunstwerke", 5)
-        room = create_RecRoom(x_length, y_length, wall_density=0.2, art_piece_number=5)
+        wall_density = 0.2
+        room = create_RecRoom(x_length, y_length, wall_density, art_piece_number)
     else:
         print("Zeichne ein Polygon.")
         user_polygon = get_polygon()
@@ -267,7 +268,8 @@ def main():
 
         if wall_mode.strip().lower() in ("", "n", "nein"):
             # wall_density = prompt_float("Wanddichte (0.0 - 1.0)", 0.2)
-            room = create_poly_room(user_polygon, wall_density=0.2, art_piece_number=5)
+            wall_density = 0.2
+            room = create_poly_room(user_polygon, wall_density, art_piece_number)
             
         else:
             print("Zeichne nun die Wände (zwei Klicks pro Wand, Enter zum Beenden).")
@@ -282,9 +284,7 @@ def main():
     
     # In beiden Fällen liefert room: (walls, art_pieces, raumPolygon)
     waendeLinien, kunstwerkPunkte, raumPolygon = room[0], room[1], room[2]
-    
 
-    
     plot_room(raumPolygon, kunstwerkPunkte, waendeLinien)
 
 if __name__ == "__main__":
