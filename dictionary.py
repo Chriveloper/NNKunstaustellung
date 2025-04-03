@@ -1,25 +1,53 @@
-from shapely.geometry import Polygon, MultiPolygon
+from shapely.geometry import Polygon, MultiPolygon, GeometryCollection
 
 def createDict(areas):
+    print("Creating dictionary of intersections")
     dictAreas = {}
     num_polygons = len(areas)
+    k = 0
 
-    # Gehe durch alle möglichen Kombinationen von Polygonen
-    for i in range(1, 2**num_polygons):  # i=0 (leere Menge) wird übersprungen
+    for i in range(1, 2**num_polygons):  # i=0 (empty set) is skipped
         intersection = None
-        locKey = [False] * num_polygons  # Standardmäßig sind alle False
+        locKey = [False] * num_polygons  
 
         for j in range(num_polygons):
-            if i & (1 << j):  # Prüfe, ob das j-te Polygon in der Kombination enthalten ist
+            if i & (1 << j):  
                 if intersection is None:
-                    intersection = areas[j]  # Starte mit dem ersten Polygon in der Kombination
+                    intersection = areas[j]  
                 else:
-                    intersection = intersection.intersection(areas[j])  # Schnittmenge berechnen
+                    # ✅ Safe check before calling `.intersects()`
+                    if intersection and not intersection.is_empty and intersection.is_valid:
+                        if intersection.intersects(areas[j]):
+                            intersection = intersection.intersection(areas[j])
+                        else:
+                            intersection = None  # No intersection possible, break early
+                            break  
+                    else:
+                        intersection = None
+                        break  
 
-                locKey[j] = True  # Markiere dieses Polygon als Teil der Schnittmenge
+                locKey[j] = True  
 
-        # Speichere das Ergebnis nur, wenn die Schnittmenge existiert und nicht leer ist
+        # Explicit check for the case where all are True
+        if all(locKey):
+            print("Checking full intersection of all polygons")
+
+        # Handle GeometryCollection by extracting only valid Polygons / MultiPolygons
+        if isinstance(intersection, GeometryCollection):
+            valid_polygons = [geom for geom in intersection.geoms if isinstance(geom, (Polygon, MultiPolygon))]
+            if len(valid_polygons) == 1:
+                intersection = valid_polygons[0]  # Return a single Polygon/MultiPolygon
+            elif len(valid_polygons) > 1:
+                intersection = MultiPolygon(valid_polygons)  # Convert list to MultiPolygon
+            else:
+                intersection = None  # No valid geometry left
+
+        # Check if intersection is valid and not empty
         if intersection and not intersection.is_empty and isinstance(intersection, (Polygon, MultiPolygon)):
             dictAreas[tuple(locKey)] = intersection
+            print("key: ", k, locKey)
+            k += 1 
+        else:
+            print(f"Skipping {tuple(locKey)}")
 
     return dictAreas
