@@ -12,3 +12,10 @@ venv\Scripts\activate
 pip install -r requirements.txt
 code .
 ```
+
+
+# Nutzung
+
+```bash
+cd NNKunstaustellung
+python room_interface.py

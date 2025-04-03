@@ -8,6 +8,9 @@ from jamico import create_poly_room, create_RecRoom
 from schatten import schatten
 from dictionary import createDict  
 from interface import get_polygon
+from scipo import find_best_combination
+from guard import setGuard
+
 
 def prompt_float(prompt_text, default):
     try:
@@ -171,7 +174,8 @@ def removeShadows(polygon_a, shadows):
         polygon_a = polygon_a.difference(shadow)
     return polygon_a
 
-def plot_room(raumPolygon, kunstwerkPunkte, waendeLinien, guards):
+
+def plot_room(raumPolygon, kunstwerkPunkte, waendeLinien):
     # Generate colors for each artwork
     colors = list(mcolors.TABLEAU_COLORS.values())
     while len(colors) < len(kunstwerkPunkte):
@@ -181,59 +185,79 @@ def plot_room(raumPolygon, kunstwerkPunkte, waendeLinien, guards):
         kunstwerkPolygon(kunstwerk, raumPolygon, waendeLinien) for kunstwerk in kunstwerkPunkte
     ]
     
+    dict_poly = createDict(visibility_polygons)
+    guards = find_best_combination(list(dict_poly.keys()))
+
+    print("guard poly: ", guards)
+
+    # Create figure and enable fullscreen
+    fig, ax = plt.subplots()
+    fig.canvas.manager.full_screen_toggle()
+
     for i, vis_poly in enumerate(visibility_polygons):
         color = colors[i % len(colors)]
         if isinstance(vis_poly, MultiPolygon):
             for poly in vis_poly.geoms:
                 x, y = poly.exterior.xy
-                plt.fill(x, y, alpha=0.2, color=color)
+                ax.fill(x, y, alpha=0.2, color=color)
         elif isinstance(vis_poly, Polygon):
             x, y = vis_poly.exterior.xy
-            plt.fill(x, y, alpha=0.2, color=color)
+            ax.fill(x, y, alpha=0.2, color=color)
         # Mark the artwork
         kunstwerk = kunstwerkPunkte[i]
-        plt.plot(kunstwerk.x, kunstwerk.y, 'o', color=color)
+        ax.plot(kunstwerk.x, kunstwerk.y, 'o', color=color)
     
     # Plot walls
     for wall in waendeLinien:
         x, y = wall.xy
-        plt.plot(x, y, color='black', linewidth=1)
+        ax.plot(x, y, color='black', linewidth=1)
     
     # Plot room boundary
     x, y = raumPolygon.exterior.xy
-    plt.plot(x, y, color='blue', linewidth=1)
+    ax.plot(x, y, color='blue', linewidth=1)
     
-    # Plot guards (if any)
-    for guard in guards:
-        plt.plot(guard.x, guard.y, 'ko')
-    
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.grid(True)
+    # Plot the guards
+    for guardPoly in guards:
+        guard = setGuard(dict_poly[list(dict_poly.keys())[guardPoly]])
+        ax.plot(guard.x, guard.y, 'ko')  # Black for guards
+        for kunstwerk in kunstwerkPunkte:
+            line = LineString([guard, kunstwerk])
+            if not any(line.intersects(wall) for wall in waendeLinien):
+                x, y = line.xy
+                ax.plot(x, y, color='black', alpha=0.3, linewidth=0.5)
+            
+    ax.set_aspect('equal', adjustable='box')
+    ax.grid(False)
     plt.show()
-    
-    dict_poly = createDict(visibility_polygons)
-    print("Keys of the visibility polygon dictionary:", dict_poly.keys())
+
+
 
 def main():
     print("Raum-Interface")
+    #devMode = input("Entwicklermodus nutzen? (j/n, default n): ")
     print("Wähle einen Raumtyp:")
     print("1) Eigenhändiges Zeichnen (Polygon) und Erzeugen des Raumes")
     print("2) Automatische Erzeugung eines rechteckigen Raumes")
     choice = input("Deine Wahl (1 oder 2, default 1): ")
     
+    # if devMode.strip().lower() in ("j", "ja"):
+    #     devMode = True
+    # else:
+    #     devMode = False
+
     if choice.strip() == "2":
-        x_length = prompt_int("Raum-Breite (x_length)", 5)
-        y_length = prompt_int("Raum-Höhe (y_length)", 5)
-        wall_density = prompt_float("Wanddichte (0.0 - 1.0)", 0.2)
+        x_length = prompt_int("Raum-Breite (x_length)", 15)
+        y_length = prompt_int("Raum-Höhe (y_length)", 15)
+        # wall_density = prompt_float("Wanddichte (0.0 - 1.0)", 0.2)
         art_piece_number = prompt_int("Anzahl Kunstwerke", 5)
-        room = create_RecRoom(x_length, y_length, wall_density, art_piece_number)
+        room = create_RecRoom(x_length, y_length, wall_density=0.2, art_piece_number=5)
     else:
         print("Zeichne ein Polygon.")
         user_polygon = get_polygon()
         if user_polygon is None:
             sys.exit("Kein gültiges Polygon gezeichnet. Programm beendet.")
         art_piece_number = prompt_int("Anzahl Kunstwerke", 5)
-        wall_mode = input("Möchtest du die Wände manuell zeichnen? (j/n, default j): ")
+        wall_mode = input("Möchtest du die Wände manuell zeichnen? (j/n, default n): ")
         walls = []
         exterior_coords = list(user_polygon.exterior.coords)
         for i in range(len(exterior_coords)):
@@ -241,7 +265,11 @@ def main():
             
             walls.append(wall)
 
-        if wall_mode.strip().lower() in ("", "j", "ja"):
+        if wall_mode.strip().lower() in ("", "n", "nein"):
+            # wall_density = prompt_float("Wanddichte (0.0 - 1.0)", 0.2)
+            room = create_poly_room(user_polygon, wall_density=0.2, art_piece_number=5)
+            
+        else:
             print("Zeichne nun die Wände (zwei Klicks pro Wand, Enter zum Beenden).")
             walls += get_walls_manual(user_polygon)
             # Option: ask if artworks should be placed manually.
@@ -251,18 +279,13 @@ def main():
             else:
                 art_pieces = generate_art_pieces(user_polygon, art_piece_number)
             room = (walls, art_pieces, user_polygon)
-        else:
-            wall_density = prompt_float("Wanddichte (0.0 - 1.0)", 0.2)
-            room = create_poly_room(user_polygon, wall_density, art_piece_number)
     
     # In beiden Fällen liefert room: (walls, art_pieces, raumPolygon)
     waendeLinien, kunstwerkPunkte, raumPolygon = room[0], room[1], room[2]
     
-    # Optional: hier können auch Wächter definiert werden, aktuell keine
-    from shapely.geometry import Point
-    guards = [Point(random.random() * 4, random.random() * 4) for _ in range(0)]
+
     
-    plot_room(raumPolygon, kunstwerkPunkte, waendeLinien, guards)
+    plot_room(raumPolygon, kunstwerkPunkte, waendeLinien)
 
 if __name__ == "__main__":
     main()

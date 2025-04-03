@@ -6,6 +6,9 @@ def get_polygon():
     points = []
     user_polygon = None
     fig, ax = plt.subplots()
+
+    fig.canvas.manager.full_screen_toggle()
+
     # Line to show the drawn polygon
     line, = ax.plot([], [], marker='o', linestyle='-', color='blue')
 
