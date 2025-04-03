@@ -7,8 +7,8 @@ def setGuard(poly):
     if isinstance(poly, MultiPolygon):
         poly = getMaxPoly(poly)
 
+
     all_points = generate_random_points(poly, num_points=10000)
-    print(f"Generated {len(all_points.geoms)} valid points inside the polygon.")
 
     
     # Find the point with the maximum distance to all walls
@@ -35,7 +35,7 @@ points = [(random.uniform(0, 300), random.uniform(0, 300)) for _ in range(5)]
 poly = Polygon(points)
 
 
-def generate_random_points(poly, num_points=100000, analysis_criteria=None):
+def generate_random_points(poly, num_points=100000):
     # Get the bounding box of the polygon
     min_x, min_y, max_x, max_y = poly.bounds
     width = max_x - min_x
@@ -57,13 +57,10 @@ def generate_random_points(poly, num_points=100000, analysis_criteria=None):
     ]
 
     # Filter the points to keep only those inside the polygon
-    valid_points = [p for p in points if poly.contains(p)]
-
-    # If analysis_criteria is provided, filter based on the analysis function
-    if analysis_criteria:
-        valid_points = [p for p in valid_points if analysis_criteria(p)]
+    valid_points = [p for p in points if poly.contains(p)] + [rep_point]
 
     # Return as a MultiPoint geometry
+    print(f"Generated {len(valid_points)} valid points inside the polygon.")
     return MultiPoint(valid_points)
 
 

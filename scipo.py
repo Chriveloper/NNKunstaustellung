@@ -8,6 +8,7 @@ def find_best_combination(arrays):
     
     # SCIP Modell erstellen
     model = Model("Set Covering")
+    model.hideOutput()
     
     # Binäre Variablen für jedes Unterarray
     x = {}

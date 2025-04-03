@@ -15,13 +15,18 @@ def createDict(areas):
                 if intersection is None:
                     intersection = areas[j]  
                 else:
-                    # ✅ Safe check before calling `.intersects()`
-                    if intersection and not intersection.is_empty and intersection.is_valid:
-                        if intersection.intersects(areas[j]):
-                            intersection = intersection.intersection(areas[j])
-                        else:
-                            intersection = None  # No intersection possible, break early
-                            break  
+                    # ✅ Ensure `intersection` is valid before calling `.intersects()`
+                    if not intersection.is_empty and intersection.is_valid and areas[j].is_valid:
+                        try:
+                            if intersection.intersects(areas[j]):
+                                intersection = intersection.intersection(areas[j])
+                            else:
+                                intersection = None  # No intersection possible, break early
+                                break  
+                        except Exception as e:
+                            print(f"Error during intersection at index {j}: {e}")
+                            intersection = None
+                            break
                     else:
                         intersection = None
                         break  
