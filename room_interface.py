@@ -234,9 +234,16 @@ def main():
             sys.exit("Kein gültiges Polygon gezeichnet. Programm beendet.")
         art_piece_number = prompt_int("Anzahl Kunstwerke", 5)
         wall_mode = input("Möchtest du die Wände manuell zeichnen? (j/n, default j): ")
+        walls = []
+        exterior_coords = list(user_polygon.exterior.coords)
+        for i in range(len(exterior_coords)):
+            wall = LineString([exterior_coords[i], exterior_coords[(i + 1)%len(exterior_coords)]])
+            
+            walls.append(wall)
+
         if wall_mode.strip().lower() in ("", "j", "ja"):
             print("Zeichne nun die Wände (zwei Klicks pro Wand, Enter zum Beenden).")
-            walls = get_walls_manual(user_polygon)
+            walls += get_walls_manual(user_polygon)
             # Option: ask if artworks should be placed manually.
             art_mode = input("Kunstwerke manuell platzieren? (j/n, default n): ")
             if art_mode.strip().lower() in ("j", "ja"):
