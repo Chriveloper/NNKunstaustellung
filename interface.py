@@ -4,6 +4,7 @@ from shapely.validation import explain_validity
 
 def get_polygon():
     points = []
+    user_polygon = None
     fig, ax = plt.subplots()
     # Line to show the drawn polygon
     line, = ax.plot([], [], marker='o', linestyle='-', color='blue')
@@ -12,7 +13,7 @@ def get_polygon():
         if event.inaxes != ax:
             return
         points.append((event.xdata, event.ydata))
-        if len(points) > 0:
+        if points:
             x, y = zip(*points)
         else:
             x, y = [], []
@@ -21,22 +22,30 @@ def get_polygon():
 
     def on_key(event):
         nonlocal user_polygon
-        if event.key == 'enter':
+        if event.key == 'escape':
+            points.clear()
+            line.set_data([], [])
+            fig.canvas.draw()
+            print("Polygon cleared.")
+        elif event.key == 'enter':
             if len(points) < 3:
                 print("Polygon requires at least 3 points.")
                 return
-            # Close the polygon by connecting back to the first point
-            polygon = Polygon(points)
-            user_polygon = polygon  # use the polygon as drawn, no simplification
-            if not user_polygon.is_valid:
-                explanation = explain_validity(user_polygon)
+            candidate = Polygon(points)
+            if not candidate.is_valid:
+                explanation = explain_validity(candidate)
                 print("Invalid polygon:", explanation)
+                points.clear()
+                line.set_data([], [])
+                fig.canvas.draw()
+                print("Please redraw the polygon.")
+                return
             else:
                 print("Valid polygon!")
-                print("Polygon vertices:", list(user_polygon.exterior.coords))
-            plt.close(fig)  # close the interface window
+                print("Polygon vertices:", list(candidate.exterior.coords))
+                user_polygon = candidate
+                plt.close(fig)
 
-    user_polygon = None
     cid_click = fig.canvas.mpl_connect('button_press_event', on_click)
     cid_key = fig.canvas.mpl_connect('key_press_event', on_key)
 

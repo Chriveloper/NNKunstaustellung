@@ -30,9 +30,8 @@ def create_poly_room(user_polygon, wall_density, art_piece_number):
     max_attempts = int(wall_density * 200)
     attempts = 0
 
-    # Define a fixed wall length (e.g., 10% of the bounding box diagonal)
+    # Diagonal of the polygon's bounding box used as a scale reference
     diag = np.sqrt((maxx - minx) ** 2 + (maxy - miny) ** 2)
-    wall_length = diag * 0.1
 
     while attempts < max_attempts:
         # Pick a random starting point strictly inside the polygon.
@@ -43,7 +42,9 @@ def create_poly_room(user_polygon, wall_density, art_piece_number):
                 pt1 = candidate
         # Choose a random angle.
         angle = random.uniform(0, 2 * np.pi)
-        pt2 = Point(pt1.x + wall_length * np.cos(angle), pt1.y + wall_length * np.sin(angle))
+        # Choose a random wall length between 5% and 30% of the diagonal.
+        random_length = random.uniform(0.05 * diag, 0.3 * diag)
+        pt2 = Point(pt1.x + random_length * np.cos(angle), pt1.y + random_length * np.sin(angle))
         candidate_wall = LineString([pt1, pt2])
         
         # Accept candidate only if the entire segment lies within the polygon.
@@ -53,10 +54,10 @@ def create_poly_room(user_polygon, wall_density, art_piece_number):
         
         # Ensure candidate wall does not properly cross any existing wall.
         valid = True
-        for wall in walls:
-            if candidate_wall.crosses(wall):
-                valid = False
-                break
+        # for wall in walls:
+        #     if candidate_wall.crosses(wall):
+        #         valid = False
+        #         break
         
         if valid:
             walls.append(candidate_wall)
@@ -64,7 +65,7 @@ def create_poly_room(user_polygon, wall_density, art_piece_number):
 
     return (walls, art_pieces, user_polygon)
 
-def create_room(x_length, y_length, wall_density, art_piece_number):
+def create_RecRoom(x_length, y_length, wall_density, art_piece_number):
     # add art pieces in random locations
     art_pieces = [Point(random.random() * x_length, random.random() * y_length) for i in range(art_piece_number)]
 
@@ -91,6 +92,9 @@ def create_room(x_length, y_length, wall_density, art_piece_number):
     outer_room = Polygon([(0, 0), (x_length, 0), (x_length, y_length), (0, y_length)])
 
     return (walls, art_pieces, outer_room)
+
+
+
 
 # # Imprecise ray casting algorithm, but probably the best approach here
 # def visibility_polygon(p, walls, num_rays=1000, N=10000):
