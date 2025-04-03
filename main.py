@@ -1,7 +1,7 @@
 import random
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from shapely.geometry import Point, Polygon, MultiPolygon
+from shapely.geometry import Point, Polygon, MultiPolygon, LineString
 from shapely.validation import explain_validity
 from jamico import create_poly_room  # use poly room version
 from schatten import schatten
@@ -9,6 +9,8 @@ from dictionary import createDict
 from scipo import find_best_combination
 from guard import setGuard
 from interface import get_polygon
+
+drawVisLines = True  
 
 # Use an interactive polygon.
 user_polygon = get_polygon()
@@ -88,12 +90,19 @@ print("guard poly: ", guardPolys)
 for guardPoly in guardPolys:
     guard = setGuard(dict_poly[list(dict_poly.keys())[guardPoly]])
     plt.plot(guard.x, guard.y, 'ko')  # Black for guards
+    if drawVisLines:
+        for kunstwerk in kunstwerkPunkte:
+                line = LineString([guard, kunstwerk])
+                if not any(line.intersects(wall) for wall in waendeLinien):
+                    x, y = line.xy
+                    plt.plot(x, y, color='red', alpha=0.3)
 
 
 
 
+# Optionally draw lines of sight from guards to art pieces
 
-
+        
 
 
 
