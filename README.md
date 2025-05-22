@@ -1,8 +1,8 @@
 # NNKunstaustellung
-oh naur
+Programm zur Erstellung und Lösung eines vereinfachten Art Gallery Problems
 
 # Setup
-in programmier ordner rein
+in Programmier-Ordner gehen
 
 ```bash
 git clone git@github.com:Chriveloper/NNKunstaustellung.git
