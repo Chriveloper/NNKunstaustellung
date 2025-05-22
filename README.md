@@ -18,4 +18,4 @@ code .
 
 ```bash
 cd NNKunstaustellung
-python room_interface.py
+python main.py
